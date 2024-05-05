@@ -1,0 +1,73 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: zhuliangyu
+      WORDPRESS_DB_PASSWORD: MYSQL_ROOT_PASSWORD
+      WORDPRESS_DB_NAME: wpdb
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_MEMORY_LIMIT', '512M' );
+    volumes:
+      - ./wordpress:/var/www/html
+      # - D:/Code/wordpress_docker/wordpress:/var/www/html
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: zhuliangyu
+      MYSQL_PASSWORD: MYSQL_ROOT_PASSWORD
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+      MYSQL_ALLOW_EMPTY_PASSWORD: '1'
+      MYSQL_RANDOM_ROOT_PASSWORD: '0'
+      MYSQL_ROOT_HOST: "%" # Allow remote access
+    volumes:
+      - ./db:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      PMA_HOST: db
+
+volumes:
+  wordpress:
+  db:
+
+# cd D:\Code\wordpress_docker
+# docker-compose -f stack.yml up
+# docker-compose -f stack.yml down
+
+# http://localhost:8080/wp-admin
+# WP admin Username: zhuliangyu
+# WP admin Password: 
+
+#  http://localhost:8081
+#  USER: zhuliangyu
+#  PASSWORD: MYSQL_ROOT_PASSWORD
+
+# localhost:3307 will connect to DB
+
+# D:/Code/wordpress_docker/wordpress
+
+# How to SSH to the server
+# do 'docker ps' to get the names and docker id for your container.
+# do 'docker exec -it <docker_id> /bin/bash'
+
+# should update .htaccess in wordpress folder
+# 在Apache服务器中，.htaccess文件可以用来覆盖部分PHP配置，包括修改php.ini中的一些数值。通过在.htaccess文件中设置特定的指令，您可以更改PHP的一些配置选项，例如upload_max_filesize、post_max_size、max_execution_time等。
+# .htaccess 文件是 Apache Web 服务器的配置文件，用于控制网站的行为。在 Nginx 服务器中，不支持直接使用 .htaccess 文件来配置网站行为。Nginx 使用不同的配置语法和结构，因此 .htaccess 文件无法直接影响 Nginx 服务器的行为。
+
+# php_value upload_max_filesize 100M
+# php_value post_max_size 42M
+# php_value max_execution_time 180
